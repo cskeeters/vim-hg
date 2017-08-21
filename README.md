@@ -1,0 +1,27 @@
+Plugin for accessing mercurial information
+
+This plugin speeds up the process of using mercurial to discover the commit
+that affected the current line in the current file.
+
+The current directory in vim must be in the same mercurial root as the current
+file when the plugin is run.
+
+This plugin requires mercurial and the hgextras package which adds `chad` and
+`chad_text` styles for hg log.
+
+hg-mappings
+===========
+
+The following mapping is suggested:
+
+`nmap <localleader>b <Plug>HgAnnotate`
+: Opens a new buffer displaying log and diff information for the commit that added the current line in its current form.
+
+`nmap <localleader>d <Plug>HgDiff`
+: This is used to show a full diff of the revision number on the current line.  This would normally be used after running `<Plug>HgAnnotate`
+
+hg_credit
+=========
+
+vim-hg (the vim plugin) was developed by Chad Skeeters <github.com/cskeeters>.
+Distributed under Vim's |license|.
