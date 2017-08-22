@@ -83,7 +83,7 @@ function! s:HgAnnotate()
 
                 let output = [text, '']
 
-                let log = split(system("hg --config defaults.log=  log --template \"{rev}: {node|short} [{separate(' ', branch, tags)}] {date|shortdate} {author|user} {desc}\\n{file_mods % '  M {file}\\n'}{file_adds % '  A {file}\\n'}{file_dels % '  R {file}\\n'}\"  -r ".rev), '\n')
+                let log = split(system("hg --config defaults.log=  log --template \"{rev}: {node|short} [{branch}{if(tags, ' {tags}')}] {date|shortdate} {author|user} {desc}\\n{file_mods % '  M {file}\\n'}{file_adds % '  A {file}\\n'}{file_dels % '  R {file}\\n'}\"  -r ".rev), '\n')
                 let output += log
 
                 let output += ['', '']
@@ -91,7 +91,7 @@ function! s:HgAnnotate()
                 let output += diff
 
                 let output += ['', '']
-                let log = split(system("hg --config defaults.log=  log --template \"{rev}: {node|short} [{separate(' ', branch, tags)}] {date|shortdate} {author|user} {desc}\\n\"  ".expand("%")), '\n')
+                let log = split(system("hg --config defaults.log=  log --template \"{rev}: {node|short} [{branch}{if(tags, ' {tags}')}] {date|shortdate} {author|user} {desc}\\n\"  ".expand("%")), '\n')
                 let output += log
 
                 "botright split __HG__
