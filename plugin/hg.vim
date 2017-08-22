@@ -82,14 +82,8 @@ function! s:HgAnnotate()
                 let text = m[2]
 
                 let output = [text, '']
-                "echo output
 
-                " this is nice because it doesn't rely on chad_text, but the
-                " add/modified file list won't be nice
-                "let log = split(system("hg --config defaults.log= log --template '{rev} - {date|shortdate} - {author|user} - {desc|firstline|strip}\\n' -r ".rev), '\n')
-
-                "echo output
-                let log = split(system("hg --config defaults.log=  log --style=chad_text -vr ".rev), '\n')
+                let log = split(system("hg --config defaults.log=  log --template \"{rev}: {node|short} [{separate(' ', branch, tags)}] {date|shortdate} {author|user} {desc}\\n{file_mods % '  M {file}\\n'}{file_adds % '  A {file}\\n'}{file_dels % '  R {file}\\n'}\"  -r ".rev), '\n')
                 let output += log
 
                 let output += ['', '']
@@ -97,7 +91,7 @@ function! s:HgAnnotate()
                 let output += diff
 
                 let output += ['', '']
-                let log = split(system("hg --config defaults.log=  log --style=chad_text ".shellescape(expand("%"))), '\n')
+                let log = split(system("hg --config defaults.log=  log --template \"{rev}: {node|short} [{separate(' ', branch, tags)}] {date|shortdate} {author|user} {desc}\\n\"  -r ".rev), '\n')
                 let output += log
 
                 "botright split __HG__
