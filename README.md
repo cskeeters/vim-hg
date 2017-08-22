@@ -6,9 +6,6 @@ that affected the current line in the current file.
 The current directory in vim must be in the same mercurial root as the current
 file when the plugin is run.
 
-This plugin requires mercurial and the hgextras package which adds `chad` and
-`chad_text` styles for hg log.
-
 mappings
 ========
 
