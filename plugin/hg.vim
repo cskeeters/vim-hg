@@ -91,7 +91,7 @@ function! s:HgAnnotate()
                 let output += diff
 
                 let output += ['', '']
-                let log = split(system("hg --config defaults.log=  log --template \"{rev}: {node|short} [{separate(' ', branch, tags)}] {date|shortdate} {author|user} {desc}\\n\"  -r ".rev), '\n')
+                let log = split(system("hg --config defaults.log=  log --template \"{rev}: {node|short} [{separate(' ', branch, tags)}] {date|shortdate} {author|user} {desc}\\n\"  ".expand("%")), '\n')
                 let output += log
 
                 "botright split __HG__
