@@ -131,7 +131,6 @@ function! s:HgGLog()
     botright edit __HG__
     setl modifiable
     call setline(1, log)
-    call cursor(3, 1)
     normal mr
     setl buftype=nofile
     setl noswapfile
