@@ -112,24 +112,34 @@ function! s:HgAnnotate()
     endif
 endfunction
 
+function! s:HgDiffRev(rev)
+    let diff = split(system("hg --config defaults.diff=  diff --color=never -c ".a:rev), '\n')
+    only
+    botright edit __DIFF__
+    setl modifiable
+    call setline(1, diff)
+    norm gg
+    setl buftype=nofile
+    setl noswapfile
+    setl nomodifiable
+    setf diff
+endfunction
+
 function! s:HgDiff()
     let line = getline('.')
-    let m = matchlist(line, '\v^([0-9]+)')
+    let m = matchlist(line, '\v^[ o|\/]*([0-9]+)')
     if len(m) > 0
         let rev = m[1]
-
-        let diff = split(system("hg --config defaults.diff=  diff --color=never -c ".rev), '\n')
-        only
-        botright edit __DIFF__
-        setl modifiable
-        call setline(1, diff)
-        norm gg
-        setl buftype=nofile
-        setl noswapfile
-        setl nomodifiable
-        setf diff
+        call s:HgDiffRev(rev)
     else
-        echo "ERROR: Could not get revision for diff from line: ".line
+        let word = expand('<cWORD>')
+        let m = matchlist(word, '\v^([0-9]+)$')
+        if len(m) > 0
+            let rev = m[1]
+            call s:HgDiffRev(rev)
+        else
+            echo "ERROR: Could not get revision for diff from line: ".line
+        endif
     endif
 endfunction
 
