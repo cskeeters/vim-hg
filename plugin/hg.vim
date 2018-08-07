@@ -64,6 +64,18 @@ function! s:HgParLineNo(lineno)
     return a:lineno - curr_diff
 endfunction
 
+function! s:HgGetLog(rev)
+    return split(system("hg --config defaults.log=  log --template \"{rev}: {node|short} [{branch}{if(tags, ' {tags}')}] {date|shortdate} {author|user} {desc}\\n{file_mods % '  M {file}\\n'}{file_adds % '  A {file}\\n'}{file_dels % '  R {file}\\n'}\"  -r ".a:rev), '\n')
+endfunction
+
+function! s:HgGetDiff(rev, file)
+    let cmd = "hg --config defaults.diff=  diff --color=never -c ".a:rev
+    if a:file != ""
+        let cmd .= " ".shellescape(a:file)
+    endif
+    return split(system(cmd), '\n')
+endfunction
+
 function! s:HgAnnotate()
     let lineno = line('.')
     let par_line_no = s:HgParLineNo(lineno)
@@ -83,12 +95,13 @@ function! s:HgAnnotate()
 
                 let output = [text, '']
 
-                let log = split(system("hg --config defaults.log=  log --template \"{rev}: {node|short} [{branch}{if(tags, ' {tags}')}] {date|shortdate} {author|user} {desc}\\n{file_mods % '  M {file}\\n'}{file_adds % '  A {file}\\n'}{file_dels % '  R {file}\\n'}\"  -r ".rev), '\n')
-                let output += log
-
+                let output += s:HgGetLog(rev)
                 let output += ['', '']
-                let diff = split(system("hg --config defaults.diff=  diff -c ".rev." ".shellescape(expand("%"))), '\n')
-                let output += diff
+
+                let output += s:HgGetDiff(rev, expand("%"))
+
+                " let diff = split(system("hg --config defaults.diff=  diff -c ".rev." ".shellescape(expand("%"))), '\n')
+                " let output += diff
 
                 let output += ['', '']
                 let log = split(system("hg --config defaults.log=  log --template \"{rev}: {node|short} [{branch}{if(tags, ' {tags}')}] {date|shortdate} {author|user} {desc}\\n\"  ".expand("%")), '\n')
@@ -112,17 +125,36 @@ function! s:HgAnnotate()
     endif
 endfunction
 
+function! s:HgGLog()
+    let log = split(system("hg --config defaults.log=  log --graph --template \"{rev}: {node|short} [{branch}{if(tags, ' {tags}')}] {date|shortdate} {author|user} {desc|firstline}\\n\""), '\n')
+
+    botright edit __HG__
+    setl modifiable
+    call setline(1, log)
+    call cursor(3, 1)
+    normal mr
+    setl buftype=nofile
+    setl noswapfile
+    " setl nomodifiable
+    setl filetype=hg
+    nmap <buffer> gd <Plug>HgDiff
+endfunction
+
 function! s:HgDiffRev(rev)
-    let diff = split(system("hg --config defaults.diff=  diff --color=never -c ".a:rev), '\n')
+    let output = s:HgGetLog(a:rev)
+    let output += ['', '']
+
+    let output += s:HgGetDiff(a:rev, "")
+
     only
     botright edit __DIFF__
     setl modifiable
-    call setline(1, diff)
+    call setline(1, output)
     norm gg
     setl buftype=nofile
     setl noswapfile
-    setl nomodifiable
-    setf diff
+    " setl nomodifiable
+    setl filetype=hg
 endfunction
 
 function! s:HgDiff()
@@ -152,3 +184,8 @@ noremap <unique> <script> <Plug>HgDiff  <SID>HgDiff
 noremap <SID>HgDiff :call <SID>HgDiff()<cr>
 noremenu <script> Plugin.HgDiff <SID>HgDiff
 command! -nargs=0 HgDiff call s:HgDiff()
+
+noremap <unique> <script> <Plug>HgGLog  <SID>HgGLog
+noremap <SID>HgGLog :call <SID>HgGLog()<cr>
+noremenu <script> Plugin.HgGLog <SID>HgGLog
+command! -nargs=0 HgGLog call s:HgGLog()
