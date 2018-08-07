@@ -127,7 +127,7 @@ endfunction
 
 function! s:HgDiff()
     let line = getline('.')
-    let m = matchlist(line, '\v^[ o|\/]*([0-9]+)')
+    let m = matchlist(line, '\v^[ @o|\/]*([0-9]+)')
     if len(m) > 0
         let rev = m[1]
         call s:HgDiffRev(rev)
