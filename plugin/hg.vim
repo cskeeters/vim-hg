@@ -76,6 +76,46 @@ function! s:HgGetDiff(rev, file)
     return split(system(cmd), '\n')
 endfunction
 
+function s:HgGetJumpLine()
+    let lineno = line('.')
+    for i in [lineno+1, lineno+2, lineno+3]
+        let line = getline(i)
+        let m = matchlist(line, '\v^.. [-]\d+,\d+ [+](\d+),\d+ ..$')
+        if len(m) > 0
+            return m[1] + 3
+        endif
+    endfor
+    return 1
+endfunction
+
+function! s:HgGoFile(goline)
+    let line = getline('.')
+    let startline = s:HgGetJumpLine()
+
+    let m = matchlist(line, '\v^(diff (--git )?a/)(\S*)')
+    if len(m) > 0
+        execute "edit ".m[3]
+        if a:goline
+            call cursor(startline, 1)
+        endif
+        return
+    endif
+
+    let m = matchlist(line, '\v^([+-]{3}) [ab]/(.*)')
+    if len(m) > 0
+        execute "edit ".m[2]
+        if a:goline
+            call cursor(startline, 1)
+        endif
+        return
+    endif
+
+    normal! gf
+    if a:goline
+        call cursor(startline, 1)
+    endif
+endfunction
+
 function! s:HgAnnotate()
     let lineno = line('.')
     let par_line_no = s:HgParLineNo(lineno)
@@ -118,6 +158,8 @@ function! s:HgAnnotate()
                 setl nomodifiable
                 setl filetype=hg
                 nmap <buffer> gd <Plug>HgDiff
+                nmap <buffer> gf <Plug>HgGoFile
+                nmap <buffer> gF <Plug>HgGoFileLine
             else
                 echo "error matching output of blame: ".annotated_line
             endif
@@ -154,6 +196,9 @@ function! s:HgDiffRev(rev)
     setl noswapfile
     " setl nomodifiable
     setl filetype=hg
+    nmap <buffer> gd <Plug>HgDiff
+    nmap <buffer> gf <Plug>HgGoFile
+    nmap <buffer> gF <Plug>HgGoFileLine
 endfunction
 
 function! s:HgDiff()
@@ -188,3 +233,11 @@ noremap <unique> <script> <Plug>HgGLog  <SID>HgGLog
 noremap <SID>HgGLog :call <SID>HgGLog()<cr>
 noremenu <script> Plugin.HgGLog <SID>HgGLog
 command! -nargs=0 HgGLog call s:HgGLog()
+
+noremap <unique> <script> <Plug>HgGoFile  <SID>HgGoFile
+noremap <SID>HgGoFile :call <SID>HgGoFile(0)<cr>
+command! -nargs=0 HgGoFile call s:HgGoFile(0)
+
+noremap <unique> <script> <Plug>HgGoFileLine  <SID>HgGoFileLine
+noremap <SID>HgGoFileLine :call <SID>HgGoFile(1)<cr>
+command! -nargs=0 HgGoFileLine call s:HgGoFile(1)
