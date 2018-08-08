@@ -5,10 +5,6 @@ endif
 
 syn keyword fileChanges Modified Added Removed Copied
 
-syn match addLine /\v^\+.*/
-syn match subLine /\v^\-.*/
-syn match diffAt /\v^\@\@ .* \@\@/
-
 syn match graphCi contained /o/
 syn match graphCur contained /@/
 
@@ -33,6 +29,11 @@ syn region fileMod start=/\v^  M / end=+$+ oneline
 syn region fileAdd start=/\v^  A / end=+$+ oneline
 syn region fileDel start=/\v^  R / end=+$+ oneline
 
+syn match addLine /\v^\+.*/
+syn match subLine /\v^\-.*/
+syn match diffAt /\v^\@\@ .* \@\@/
+syn match diff /\v^diff .*/
+
 hi default link fileMod Directory
 hi default link fileAdd String
 hi default link fileDel Character
@@ -40,6 +41,7 @@ hi default link fileDel Character
 hi default link addLine String
 hi default link subLine Character
 hi default link diffAt Conditional
+hi default link diff Directory
 
 hi default link fileChanges Include
 hi default link hgTag Include
