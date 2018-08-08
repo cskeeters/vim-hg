@@ -13,7 +13,7 @@ syn match graphCi contained /o/
 syn match graphCur contained /@/
 
 syn match sha contained /\v\i{12}/
-syn match rev /[0-9]/
+syn match rev contained /[0-9]/
 
 syn match description contained /\v.*/
 syn match username contained /\v[a-zA-Z]+/ nextgroup=description skipwhite
